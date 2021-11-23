@@ -18,6 +18,8 @@ namespace pazz
         int Y_part = 0;
         int Box_x_part = 0;
         int Box_y_part = 0;
+        const int Up_bound = 625;
+        const int Low_bound = 16;
         PictureBox Fixed_image = null;
         Bitmap Input_image = null;
         readonly DirectoryInfo Directory = new(@"puzzles\");
@@ -196,7 +198,8 @@ namespace pazz
                     PictureBox pointim = (PictureBox)panel1.GetChildAtPoint(new Point(i * box_x_part, j * box_y_part));
                     if (pointim != null)
                     {
-                        string imagePath = @"puzzles\" + rand.Next(0, 1000).ToString() + i.ToString() + rand.Next(0, 1000).ToString() + j.ToString() + ".png";
+                        int name_random_bound = 1000;
+                        string imagePath = @"puzzles\" + rand.Next(0, name_random_bound).ToString() + i.ToString() + rand.Next(0, name_random_bound).ToString() + j.ToString() + ".png";
                         pointim.Image.Save(imagePath, System.Drawing.Imaging.ImageFormat.Png);
                     }                    
                 }
@@ -207,38 +210,38 @@ namespace pazz
         private void Split_button_Click(object sender, EventArgs e)
         {
             panel1.Controls.Clear();
-            int int_check;
-            if (!int.TryParse(textBox1.Text, out int_check) || !int.TryParse(textBox2.Text, out int_check))
+            if (!int.TryParse(textBox1.Text, out int int_check) || !int.TryParse(textBox2.Text, out int_check))
             {
                 MessageBox.Show("This is a number only field");
             }
             else // split into methods
             {
-                if (625 >= int.Parse(textBox1.Text) * int.Parse(textBox2.Text) & int.Parse(textBox1.Text) * int.Parse(textBox2.Text) >= 16 & int.Parse(textBox1.Text) > 0 & int.Parse(textBox2.Text) > 0)
+                if (Up_bound >= int.Parse(textBox1.Text) * int.Parse(textBox2.Text) & int.Parse(textBox1.Text) * int.Parse(textBox2.Text) >= Low_bound & int.Parse(textBox1.Text) > 0 & int.Parse(textBox2.Text) > 0)
                 {
                     PartSetter();
                     List<KeyValuePair<int, int>> pairs = PairsCreate();
-                    Random r = new();                   
+                    Random r = new();
                     for (int i = 0; i < X_parts_number; i++)
                     {
                         for (int j = 0; j < Y_parts_number; j++)
                         {
                             Bitmap iter_image = Input_image.Clone(new Rectangle(i * X_part, j * Y_part, Input_image.Width / X_parts_number, Input_image.Height / Y_parts_number), Input_image.PixelFormat);
-                            PictureBox pazzle = new PictureBox();                            
+                            PictureBox pazzle = new();
                             pazzle.Image = iter_image;
-                            int ro = r.Next(0, 10);
+                            int random_bound = 10;
+                            int ro = r.Next(0, random_bound);
                             if (ro % 2 == 0)
                             {
                                 Image img = pazzle.Image;
                                 img.RotateFlip(RotateFlipType.Rotate180FlipX);
                                 pazzle.Image = img;
-                            }                            
-                            pazzle.MouseClick += new MouseEventHandler(Puzzle_Click);                            
+                            }
+                            pazzle.MouseClick += new MouseEventHandler(Puzzle_Click);
                             panel1.Controls.Add(pazzle);
                             int ri = r.Next(0, pairs.Count);
-                            pazzle.Location = new Point(pairs[ri].Key * Box_x_part, pairs[ri].Value * Box_y_part);                         
+                            pazzle.Location = new Point(pairs[ri].Key * Box_x_part, pairs[ri].Value * Box_y_part);
                             pazzle.SizeMode = PictureBoxSizeMode.StretchImage;
-                            pazzle.Size = new Size(pictureBox1.Width / X_parts_number, pictureBox1.Height / Y_parts_number);                        
+                            pazzle.Size = new Size(pictureBox1.Width / X_parts_number, pictureBox1.Height / Y_parts_number);
                             pairs.RemoveAt(ri);
                         }
                     }
@@ -247,7 +250,7 @@ namespace pazz
                 }
                 else
                 {
-                    MessageBox.Show("Quantity of puzzles must be >= 16 and <= 625");
+                    MessageBox.Show("Quantity of puzzles must be between 16 and 625");
                 }
             }
         }
@@ -310,7 +313,7 @@ namespace pazz
                             pointim.Image = Image.FromFile(file.ToString());
                             dirlist.Remove(file);
                             pointim.Refresh();
-                            goto OuterLoop;
+                            break;
                         }
                         else if (ImageComparison(f, new Bitmap(SpinImage(Image.FromFile(file.ToString())))))
                         {
@@ -318,11 +321,9 @@ namespace pazz
                             pointim.Image = SpinImage(Image.FromFile(file.ToString()));
                             dirlist.Remove(file);
                             pointim.Refresh();
-                            goto OuterLoop;
+                            break;
                         }
-                    }                   
-                OuterLoop:
-                    continue;
+                    }
                 }                
             }
             ComposionStateEnd();            
