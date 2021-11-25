@@ -138,6 +138,7 @@ namespace pazz
             // compose_button
             // 
             this.compose_button.BackColor = System.Drawing.Color.MediumTurquoise;
+            this.compose_button.Enabled = false;
             this.compose_button.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.compose_button.Location = new System.Drawing.Point(506, 371);
             this.compose_button.MaximumSize = new System.Drawing.Size(150, 40);
@@ -203,12 +204,12 @@ namespace pazz
             this.label6.TabIndex = 14;
             this.label6.Text = "*Leftclick on puzzles\r\n to swap them\r\n\r\n**Rightclick on puzzle\r\n to spin it";
             // 
-            // label7
+            // composing_label
             // 
             this.composing_label.AutoSize = true;
             this.composing_label.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.composing_label.Location = new System.Drawing.Point(314, 217);
-            this.composing_label.Name = "label7";
+            this.composing_label.Name = "composing_label";
             this.composing_label.Size = new System.Drawing.Size(124, 23);
             this.composing_label.TabIndex = 15;
             this.composing_label.Text = "Composing . . .";

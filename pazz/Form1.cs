@@ -31,10 +31,9 @@ namespace pazz
         }
 
         private void Form1_Load(object sender, EventArgs e)
-        {  
+        {
             initSize = Size;  
         }
-
         //Scale all controls of form and panel
         protected override void OnResize(EventArgs e)
         {
@@ -62,7 +61,8 @@ namespace pazz
         //Split image into puzzles and displays them
         private void Split_button_Click(object sender, EventArgs e)
         {
-            Splitter(panel1, textBox1, textBox2, pictureBox1, this);            
+            Splitter(panel1, textBox1, textBox2, pictureBox1, this);
+            compose_button.Enabled = true;
         }
 
         //Open file dialog for image selection
@@ -81,8 +81,9 @@ namespace pazz
         private void Compose_button_Click(object sender, EventArgs e)
         {
             ComposionStateBegin(composing_label);
-            PartSetter(pictureBox1, textBox1, textBox2);
-            ComposionAlgo(panel1, composing_label, this);
+            ComposionPartSetter();
+            SecondPartSetter(pictureBox1);
+            ComposionAlgo(pictureBox1, panel1, composing_label, this);
             ComposionStateEnd(composing_label, this);            
         }
     }

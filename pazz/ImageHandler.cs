@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using System.Windows.Forms;
 using static pazz.Form1;
-using static pazz.ImageComposer;
+using static pazz.ImageSplitter;
 
 
 namespace pazz
@@ -76,7 +76,8 @@ namespace pazz
 
         public static void CheckPuzzles(PictureBox pictureBox1, TextBox textBox1, TextBox textBox2, Panel panel1)
         {
-            PartSetter(pictureBox1, textBox1, textBox2);
+            PartSetter(textBox1, textBox2);
+            SecondPartSetter(pictureBox1);
             for (int i = 0; i < X_parts_number; i++)
             {
                 for (int j = 0; j < Y_parts_number; j++)

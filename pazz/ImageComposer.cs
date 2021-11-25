@@ -10,22 +10,23 @@ namespace pazz
 {
     public static class ImageComposer
     {
-        public static void PartSetter(PictureBox pictureBox1, TextBox textBox1, TextBox textBox2)
+        static List<FileInfo> dirlist = new(MyDirectory.GetFiles().ToList());
+
+        //This method allow to autocompose puzzles without knowledge of data textboxes
+        public static void ComposionPartSetter()
         {
-            X_parts_number = int.Parse(textBox1.Text);
-            Y_parts_number = int.Parse(textBox2.Text);
-
-            Input_image = new(pictureBox1.Image);
-            if (X_parts_number != 0 & Y_parts_number != 0)
+            dirlist = new(MyDirectory.GetFiles().ToList());
+            if (dirlist.Count != 0)
             {
-                X_part = Input_image.Width / X_parts_number;
-                Y_part = Input_image.Height / Y_parts_number;
-
+                X_parts_number = Input_image.Width / Image.FromFile(dirlist[0].ToString()).Width;
+                Y_parts_number = Input_image.Height / Image.FromFile(dirlist[0].ToString()).Height;
             }
-            if (X_part != 0 & Y_part != 0)
+            else { MessageBox.Show("No puzzles"); return; }
+
+            while (X_parts_number * Y_parts_number != dirlist.Count)
             {
-                Box_x_part = pictureBox1.Width / X_parts_number;
-                Box_y_part = pictureBox1.Height / Y_parts_number;
+                if (X_parts_number > Y_parts_number) { X_parts_number--; }
+                else if (X_parts_number < Y_parts_number) { Y_parts_number--; }
             }
         }
         public static void ComposionStateBegin(Label composing_label)
@@ -41,9 +42,9 @@ namespace pazz
             f.MaximizeBox = true;
         }
         
-        public static void ComposionAlgo(Panel panel1, Label l, Form1 formex )
+        public static void ComposionAlgo(PictureBox pictureBox1, Panel panel1, Label composion_label, Form1 formex )
         {
-            List<FileInfo> dirlist = new(MyDirectory.GetFiles().ToList());
+            dirlist = new(MyDirectory.GetFiles().ToList());
             for (int i = 0; i < X_parts_number; i++)
             {
                 for (int j = 0; j < Y_parts_number; j++)
@@ -54,7 +55,7 @@ namespace pazz
                     {
                         if ((PictureBox)panel1.GetChildAtPoint(new Point(i * Box_x_part, j * Box_y_part)) == null)
                         {
-                            ComposionStateEnd(l, formex);
+                            ComposionStateEnd(composion_label, formex);
                             MessageBox.Show("Too small size of puzzles");
                             return;
                         }

@@ -4,7 +4,6 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using static pazz.Form1;
-using static pazz.ImageComposer;
 using static pazz.ImageHandler;
 
 namespace pazz
@@ -25,17 +24,49 @@ namespace pazz
             return pairs;
 
         }
-        //Save puzzles to folder
-        public static void SavePuzzles(Panel panel1)
+        public static void ClearFolder()
         {
             GC.Collect();
             GC.WaitForPendingFinalizers();
-            MyDirectory.Delete(true);
             bool exists = Directory.Exists(MyDirectory.ToString());
-            if (!exists)
+            if (exists)
+            {
+                foreach (FileInfo file in MyDirectory.GetFiles())
+                {
+                    file.Delete();
+                }
+                Directory.CreateDirectory(MyDirectory.ToString());
+            }
+            else if (!exists)
             {
                 Directory.CreateDirectory(MyDirectory.ToString());
             }
+            
+        }
+        public static void PartSetter(TextBox textBox1, TextBox textBox2)
+        {
+            X_parts_number = int.Parse(textBox1.Text);
+            Y_parts_number = int.Parse(textBox2.Text);
+        }
+        public static void SecondPartSetter(PictureBox pictureBox1)
+        {
+            Input_image = new(pictureBox1.Image);
+            if (X_parts_number != 0 & Y_parts_number != 0)
+            {
+                X_part = Input_image.Width / X_parts_number;
+                Y_part = Input_image.Height / Y_parts_number;
+
+            }
+            if (X_part != 0 & Y_part != 0)
+            {
+                Box_x_part = pictureBox1.Width / X_parts_number;
+                Box_y_part = pictureBox1.Height / Y_parts_number;
+            }
+        }
+        //Save puzzles to folder
+        public static void SavePuzzles(Panel panel1)
+        {
+            ClearFolder();
             Random rand = new();
             for (int i = 0; i < X_parts_number; i++)
             {
@@ -68,7 +99,8 @@ namespace pazz
             {
                 if (Up_bound >= int.Parse(textBox1.Text) * int.Parse(textBox2.Text) & int.Parse(textBox1.Text) * int.Parse(textBox2.Text) >= Low_bound & int.Parse(textBox1.Text) > 0 & int.Parse(textBox2.Text) > 0)
                 {
-                    PartSetter(pictureBox1, textBox1, textBox2);
+                    PartSetter(textBox1, textBox2);
+                    SecondPartSetter(pictureBox1);
                     List<KeyValuePair<int, int>> pairs = PairsCreate();
                     Random r = new();
                     for (int i = 0; i < X_parts_number; i++)
