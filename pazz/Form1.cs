@@ -24,6 +24,7 @@ namespace pazz
         public static PictureBox Fixed_image = null;
         public static Bitmap Input_image = null;
         public static readonly DirectoryInfo MyDirectory = new(@"puzzles\");
+        //public static readonly DirectoryInfo Sd = new(@"spuz\");
 
         public Form1()
         {
@@ -83,7 +84,7 @@ namespace pazz
             ComposionStateBegin(composing_label);
             ComposionPartSetter();
             SecondPartSetter(pictureBox1);
-            ComposionAlgo(pictureBox1, panel1, composing_label, this);
+            ComposionAlgo(panel1, composing_label, this);
             ComposionStateEnd(composing_label, this);            
         }
     }
