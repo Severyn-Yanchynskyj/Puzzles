@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -40,27 +41,130 @@ namespace pazz
             f.MinimizeBox = true;
             f.MaximizeBox = true;
         }
-        
-        public static void ComposionAlgo(Panel panel1, Label composion_label, Form1 formex )
+
+        //Merge 2 images
+        public static Bitmap ImConc(Bitmap bo, Bitmap bt)
         {
-            dirlist= new(MyDirectory.GetFiles().OrderBy(f => f.LastWriteTime).ToList());
-            for (int i = 0; i < X_parts_number; i++)
+            if ( bt == null)
             {
-                for (int j = 0; j < Y_parts_number; j++)
+                return bo;
+            }
+            Bitmap rim = new(bo.Width, bo.Height + bt.Height);
+            for (int i = 0; i < bo.Width; i++)
+            {
+                for (int j = 0; j < bo.Height; j++)
                 {
-                    PictureBox pointim = (PictureBox)panel1.GetChildAtPoint(new Point(i * Box_x_part, j * Box_y_part));
-                    if ((PictureBox)panel1.GetChildAtPoint(new Point(i * Box_x_part, j * Box_y_part)) == null || pointim==null || dirlist[0]==null)
-                    {
-                        ComposionStateEnd(composion_label, formex);
-                        MessageBox.Show("Too small size of puzzles");
-                        return;
-                    }
                     
-                    pointim.Image = Image.FromFile(dirlist[0].ToString());
-                    dirlist.Remove(dirlist[0]);
-                    pointim.Refresh();
+                    rim.SetPixel(i,j,bo.GetPixel(i,j));
                 }
             }
+            for (int i = 0; i < bo.Width; i++)
+            {               
+                for (int j = bo.Height; j < rim.Height; j++)
+                {
+
+                    rim.SetPixel(i, j, bt.GetPixel(i, j- bo.Height));
+                }
+            }
+            return rim;
+        }
+
+        //Merge 2 images if their bound pixels are compatible
+        public static Bitmap ImageBoundСompatibility(Bitmap bo, Bitmap bt)
+        {
+            int maxpixelvalue = 255;
+            int colornumber = 3;
+            int maxdif = bo.Width * colornumber * maxpixelvalue;
+            double firstImdifsum = 0;//sum of differences of bound pixels on one side           
+            for (int i = 0; i < bo.Width; i++)
+            {
+                firstImdifsum += Math.Abs(bo.GetPixel(i, bo.Height - 1).R - bt.GetPixel(i, 0).R);
+                firstImdifsum += Math.Abs(bo.GetPixel(i, bo.Height - 1).G - bt.GetPixel(i, 0).G);
+                firstImdifsum += Math.Abs(bo.GetPixel(i, bo.Height - 1).B - bt.GetPixel(i, 0).B);
+            }
+            double secImdifsum = 0;//sum of differences of bound pixels on the other side 
+            for (int i = 0; i < bo.Width; i++)
+            {
+                secImdifsum += Math.Abs(bt.GetPixel(i, bt.Height - 1).R - bo.GetPixel(i, 0).R);
+                secImdifsum += Math.Abs(bt.GetPixel(i, bt.Height - 1).G - bo.GetPixel(i, 0).G);
+                secImdifsum += Math.Abs(bt.GetPixel(i, bt.Height - 1).B - bo.GetPixel(i, 0).B);
+            }
+            //the percentage of incompatibility, which must be less than 1 % for the puzzles to be compatible
+            double po = firstImdifsum / maxdif;
+            double pt = secImdifsum / maxdif;
+            double limitpercent = 0.01;
+            if (po < limitpercent)
+            {
+                return ImConc(bo, bt);
+            }
+            else if (pt < limitpercent)
+            {
+                return ImConc(bt, bo);
+            }
+            return null;
+        }
+        
+        public static void ComposionAlgo(PictureBox p, PictureBox p2)
+        {
+            dirlist = new(MyDirectory.GetFiles().ToList());
+            List<Bitmap> lineslist = new();
+            Bitmap startpuzzle;
+            //compose columns of puzzles one by one
+            for (int i = 0; i < X_parts_number; i++)
+            {
+                startpuzzle = (Bitmap)Image.FromFile(dirlist[0].FullName);
+                dirlist.RemoveAt(0);
+                int imcount = 1;
+                while (imcount != Y_parts_number)
+                {
+                    foreach (FileInfo f in dirlist)
+                    {
+                        Bitmap compres = ImageBoundСompatibility(startpuzzle, (Bitmap)Image.FromFile(f.FullName));
+                        if (compres != null)
+                        {
+                            startpuzzle = compres;
+                            imcount++;
+                            dirlist.Remove(f);
+                            p2.Image = startpuzzle;
+                            p2.Refresh();
+                            break;                           
+                        }
+
+                    }
+
+                }
+                //rotate composed column and store it to list
+                Image rotstim = startpuzzle;
+                rotstim.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                lineslist.Add((Bitmap)rotstim);
+            }
+            //compose rotated composed columns like another column
+            int secimcount = 1;
+            Bitmap finalpuzzle = lineslist[0];
+            lineslist.RemoveAt(0);
+            while (secimcount != X_parts_number)
+            {
+                foreach (Bitmap bl in lineslist)
+                {
+                    Bitmap compres = ImageBoundСompatibility(finalpuzzle, bl);
+                    if (compres != null)
+                    {
+                        finalpuzzle = compres;
+                        secimcount++;
+                        lineslist.Remove(bl);
+                        p2.Image = finalpuzzle;
+                        p2.Refresh();
+                        break;                         
+                    }
+
+                }
+
+            }
+            //rotate image to the correct position
+            Image rotfim = finalpuzzle;
+            rotfim.RotateFlip(RotateFlipType.Rotate270FlipNone);
+            rotfim = new Bitmap(rotfim, p.Size); 
+            p2.Image = rotfim;
         }
     }
 }

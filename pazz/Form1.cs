@@ -84,7 +84,7 @@ namespace pazz
             ComposionStateBegin(composing_label);
             ComposionPartSetter();
             SecondPartSetter(pictureBox1);
-            ComposionAlgo(panel1, composing_label, this);
+            ComposionAlgo(pictureBox1, pictureBox2);
             ComposionStateEnd(composing_label, this);            
         }
     }
